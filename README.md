@@ -1,7 +1,7 @@
 # slassignment
 Stream Labs Assignment problem for backend developer position (Ultimately full stack developement!!!)
 
-#Architecture
+# Architecture
 ## Server
 I have chosen [Java play framework](https://www.playframework.com/) for the server. 
 The alternatives are **Sprint Boot** and **Apache Jersey with Tomcat/Jetty**.
