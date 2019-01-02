@@ -87,7 +87,7 @@ public class LiveChatMessageActor extends AbstractActor {
 					cm.setTime(new Date());
 
 					ChatBroadCastManager.getInstance().addActor(cm.getVideoId(), out);
-					ChatStatsManager.getInstance().addChannel(out);
+					ChatStatsManager.getInstance().addChannel(out, cm.getVideoId());
 					
 					
 					if(FETCH_YTLIVE_MESSAGES) {
