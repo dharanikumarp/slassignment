@@ -5,6 +5,8 @@ import SecuredRoute from './SecuredRoute/SecuredRoute';
 import Streams from './Streams/Streams';
 import Stream from './Stream/Stream';
 import UserTable from './Users/UserTable';
+import Messages from './Messages/Messages';
+import AllUserAndStreamStats from './Stats/AllUserAndStreamStats';
 
 class App extends Component {
   render() {
@@ -21,6 +23,8 @@ class App extends Component {
         <SecuredRoute exact path='/streams' component={Streams}/>
         <SecuredRoute exact path='/stream' component={Stream}/>
         <SecuredRoute exact path='/users' component={UserTable}/>
+        <SecuredRoute exact path='/stats' component={AllUserAndStreamStats}/>
+        <SecuredRoute exact path='/messages' component={Messages}/>
       </div>
     );
   }
