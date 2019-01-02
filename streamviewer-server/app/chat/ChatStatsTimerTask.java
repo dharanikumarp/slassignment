@@ -80,14 +80,17 @@ public class ChatStatsTimerTask extends TimerTask {
 		
 		Set<ActorRef> actorSet = channelVsVideoId.keySet();
 		final List<UserChatStats> userStatList = new ArrayList<>();
+		Set<String> visitedVideoIds = new HashSet<String>(); 
 		for (ActorRef ar : actorSet) {
 			final String videoId = channelVsVideoId.get(ar);
-			List<Document> countMessagesByUser = ChatMessageUtil.getCountChatMessagesForVideoByUser(videoId);
-			if (countMessagesByUser != null && !countMessagesByUser.isEmpty()) {
-				countMessagesByUser.forEach((doc) -> {
-					userStatList.add(new UserChatStats(doc.getString("_id"), doc.getString("sender"),
-							doc.getInteger("num_messages").intValue(), videoId));
-				});
+			if(visitedVideoIds.add(videoId)) {
+				List<Document> countMessagesByUser = ChatMessageUtil.getCountChatMessagesForVideoByUser(videoId);
+				if (countMessagesByUser != null && !countMessagesByUser.isEmpty()) {
+					countMessagesByUser.forEach((doc) -> {
+						userStatList.add(new UserChatStats(doc.getString("_id"), doc.getString("sender"),
+								doc.getInteger("num_messages").intValue(), videoId));
+					});
+				}
 			}
 			// userMessagesInVideo.put(string, userStatList);
 		}
