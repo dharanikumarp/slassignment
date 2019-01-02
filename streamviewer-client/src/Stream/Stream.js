@@ -5,17 +5,14 @@ import Chat from '../Chat/Chat';
 import AUTH_CLIENT from '../Auth';
 import UserStats from '../Stats/UserStats';
 import RollingTimeStatsTable from '../Stats/RollingTimeStatsTable';
+import {WS_CHAT} from '../Urls';
 
 class Stream extends Component {
 
     constructor(props) {
         super(props);
-        console.log('Stream.Stream() ', this.props);
         const { stream } = this.props.location.state;
-        console.log(stream);
-
-        //this.setState({stream: stream});
-        //this.setState({videoId: stream.videoId});
+        console.log('selected stream ',stream);
         
         this.state = {
             sender: AUTH_CLIENT.getProfile().name,
@@ -37,61 +34,14 @@ class Stream extends Component {
                 {interval: 'One Minute', freq: 'loading...'}
             ],
         };
-
-        console.log('this.state ', this.state);
-       
-        //this.sendHeartBeat = this.sendHeartBeat.bind(this);
-        //this.joinRoom = this.joinRoom.bind(this);
-        //this.wsOnOpen = this.wsOnOpen.bind(this);
     }
-
-    wsOnOpen = () => {
-        console.log('WebSocket connected ', this.ws.readyState);
-        this.joinRoom();
-    };
-
-    joinRoom = () => {
-        console.log('joinRoom ', this.ws.readyState);
-        if(this.ws.readyState === this.ws.OPEN) {
-            let message = {
-                type: 'join',
-                googleUserId: this.state.googleUserId,
-                gmail: this.state.gmail,
-                videoId: this.state.videoId,
-                sender: this.state.sender,
-                profileImageUrl: this.state.profileImageUrl,
-                title: this.state.title,
-                description: this.state.description
-            };
-            console.log('Before sending join message');
-            this.ws.send(JSON.stringify(message));
-            console.log('After sending join message');
-        }
-    };
-
-    // componentDidUpdate() {
-    //     console.log(this.props.location.state);
-    //     const { stream } = this.props.location.state;
-    //     console.log(stream);
-    //     this.setState({stream: stream});
-    //     this.setState({videoId: stream.videoId});
-    // }
-
+    
     componentDidMount() {
-        // console.log('props ', this.props);
-        // const { match: { params } } = this.props;
-        // let currentStream = CURR_LIVE_STREAMS.getStream(params.videoId);
-        // console.log('Stream.Stream() ', currentStream);
-        // this.setState({videoId: currentStream.videoId});
-        // this.setState({stream: currentStream});
-
-        console.log(this.props.location.state);
         const { stream } = this.props.location.state;
-        console.log(stream);
         this.setState({stream: stream});
         this.setState({videoId: stream.videoId});
         
-        this.ws = new WebSocket('ws://localhost:9000/chat');
+        this.ws = new WebSocket(WS_CHAT);
         this.ws.onopen = () => {
             console.log('onOpen event handler', this.ws.readyState);
             
@@ -104,11 +54,10 @@ class Stream extends Component {
                     sender: this.state.sender,
                     profileImageUrl: this.state.profileImageUrl,
                     title: this.state.title,
-                    description: this.state.description 
+                    description: this.state.description,
+                    liveChatId: this.state.stream.liveChatId 
                 };
-                console.log('Before sending join message');
                 this.ws.send(JSON.stringify(message));
-                console.log('After sending join message');
             }
             setInterval(this.sendHeartBeat, 10000);
         };
@@ -123,25 +72,35 @@ class Stream extends Component {
               this.setState({messages: [...this.state.messages, received]});
             }
           } else if(received.type === 'heartbeat') {
-            console.log('heartbeat received');
+            
+          } else if(received.type === 'history') {
+              console.log('type is history');
+              if(received.history && received.history.length > 0) {
+                console.log('history ', received.history);
+                this.setState({messages: [...this.state.messages, ...received.history]});  
+              }
           } else if(received.type === 'stats') {
             let userStats = received.userStats.filter(e => e.videoId === this.state.videoId);
-            console.log('userStats ', userStats);
-            this.setState({userStats: userStats});
+            if(userStats.length) {
+                this.setState({userStats: userStats});
+            }
 
-            let stats = received.stats.find(e => e.videoId === this.state.videoId);
-            this.setState({numMessagesPerSecond: stats.numMessages});
+            //let stats = received.stats.find(e => e.videoId === this.state.videoId);
+            //this.setState({numMessagesPerSecond: stats.numMessages});
 
-            let rollingStats = received.rollingStats.find(e => e.videoId === this.state.videoId).rollingSummary;
-            console.log('rollingStat ', rollingStats);
-
-            this.setState({rollingStats: [
-                 {interval: 'One Second', freq: '' + rollingStats[0]},
-                 {interval: 'Five Seconds', freq: '' + rollingStats[1]},
-                 {interval: 'Ten Seconds', freq: '' + rollingStats[2]},
-                 {interval: 'Thirty Seconds', freq: '' + rollingStats[3]},
-                 {interval: 'One Minute', freq: '' + rollingStats[4]}
-            ]});
+            let rollingStats = received.rollingStats.find(e => e.videoId === this.state.videoId)
+            if(rollingStats) {
+                let rollingSummary = rollingStats.rollingSummary;
+                this.setState({rollingStats: [
+                    {interval: 'One Second', freq: '' + rollingSummary[0]},
+                    {interval: 'Five Seconds', freq: '' + rollingSummary[1]},
+                    {interval: 'Ten Seconds', freq: '' + rollingSummary[2]},
+                    {interval: 'Thirty Seconds', freq: '' + rollingSummary[3]},
+                    {interval: 'One Minute', freq: '' + rollingSummary[4]}
+               ]});
+            }
+            
+            
           }
         };
       }
@@ -153,9 +112,7 @@ class Stream extends Component {
     }
 
     handleNewUserMessage = (newMessage) => {
-        console.log('newMessage ', newMessage);
-        console.log('this.ws.readyState ', this.ws.readyState);
-
+        
         if(this.ws.readyState === this.ws.OPEN) {
             // Now send the message throught the backend API
             let message = {
@@ -167,7 +124,9 @@ class Stream extends Component {
                 sender: this.state.sender,
                 title: this.state.title,
                 description: this.state.description,
-                profileImageUrl: this.state.profileImageUrl
+                profileImageUrl: this.state.profileImageUrl,
+                liveChatId: this.state.stream.liveChatId,
+                accessToken: AUTH_CLIENT.getAccessToken()
             };
             this.ws.send(JSON.stringify(message));
         } else {

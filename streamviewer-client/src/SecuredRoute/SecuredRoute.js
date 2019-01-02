@@ -9,7 +9,6 @@ function SecuredRoute(props) {
 
             if(!AUTH_CLIENT.isAuthenticated()) {
                 props.history.replace('/');
-                //auth.signin
                 return <div></div>
             }
 

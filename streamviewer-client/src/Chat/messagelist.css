@@ -1,0 +1,29 @@
+.chat-messages {
+    border: solid 1px #999999;
+    border-top-color: #CCCCCC;
+    border-left-color: #CCCCCC;
+    width: 100%;
+    height: 212px;
+    overflow-y: scroll;
+    border-radius: 5px;
+}
+
+.message-container {
+    border: 2px solid #dedede;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px 0;
+    width: 100%;
+}
+
+.message-container img{
+    margin-right: 20px;
+}
+
+.message-container::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
