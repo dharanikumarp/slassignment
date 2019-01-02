@@ -1,12 +1,14 @@
 package utils;
 
 import static utils.UrlsAndConstants.API_KEY;
+
 import static utils.UrlsAndConstants.LIVEBROADCAST_URL;
 import static utils.UrlsAndConstants.MAX_RESULTS;
 import static utils.UrlsAndConstants.SEARCH_TERM;
 import static utils.UrlsAndConstants.SEARCH_URL;
 import static utils.UrlsAndConstants.SUBSCRIPTION_URL;
 import static utils.UrlsAndConstants.VIDEOS_URL;
+import static utils.UrlsAndConstants.SHOW_PUBLIC_BROADCASTS;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -165,34 +167,37 @@ public final class LiveStreamsUtil {
 	 */
 	public static List<LiveStream> getPublicLiveStreams(final WSClient ws, final String accessToken) {
 		List<LiveStream> liveStreams = new ArrayList<>();
+		
+		if(SHOW_PUBLIC_BROADCASTS) {
+			CompletionStage<JsonNode> futureResponse = ws.url(SEARCH_URL).addQueryParameter("part", "snippet")
+					.addQueryParameter("key", API_KEY).addQueryParameter("maxResults", "" + MAX_RESULTS)
+					.addQueryParameter("type", "video").addQueryParameter("eventType", "live")
+					.addQueryParameter("q", SEARCH_TERM)
+					// .addHeader("Authorization", "Bearer " + accessToken)
+					.get().thenApply(r -> r.asJson());
 
-		CompletionStage<JsonNode> futureResponse = ws.url(SEARCH_URL).addQueryParameter("part", "snippet")
-				.addQueryParameter("key", API_KEY).addQueryParameter("maxResults", "" + MAX_RESULTS)
-				.addQueryParameter("type", "video").addQueryParameter("eventType", "live")
-				.addQueryParameter("q", SEARCH_TERM)
-				// .addHeader("Authorization", "Bearer " + accessToken)
-				.get().thenApply(r -> r.asJson());
+			try {
+				JsonNode json = futureResponse.toCompletableFuture().get();
+				System.out.println("json " + json.toString());
 
-		try {
-			JsonNode json = futureResponse.toCompletableFuture().get();
-			System.out.println("json " + json.toString());
+				int numResults = json.get("pageInfo").get("totalResults").asInt();
 
-			int numResults = json.get("pageInfo").get("totalResults").asInt();
+				if (numResults != 0) {
+					for (int i = 0; i < MAX_RESULTS; i++) {
 
-			if (numResults != 0) {
-				for (int i = 0; i < MAX_RESULTS; i++) {
-
-					JsonNode jn = json.get("items").get(i);
-					LiveStream ls = getLiveStream(ws, jn, accessToken);
-					if (ls != null) {
-						liveStreams.add(ls);
+						JsonNode jn = json.get("items").get(i);
+						LiveStream ls = getLiveStream(ws, jn, accessToken);
+						if (ls != null) {
+							liveStreams.add(ls);
+						}
 					}
 				}
-			}
 
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
+			} catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+			}
 		}
+		
 		return liveStreams;
 	}
 
