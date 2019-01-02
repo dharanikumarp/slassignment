@@ -1,0 +1,35 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+#GET     /home                           controllers.HomeController.index
+#GET     /ws                         controllers.HomeController.ws
+
+GET		/chat						controllers.ChatController.chat
+GET		/stats						controllers.StatisticsController.stats
+
+#GET     /sentiment/:symbol          controllers.StockSentiment.get(symbol)
+#GET		/messages/:emailId			controllers.MessagesController.getMessages(emailId)
+
+OPTIONS	/users						controllers.UserController.getAllUsers
+POST	/users						controllers.UserController.getAllUsers
+
+POST	/login						controllers.AuthenticationController.login
+OPTIONS	/login						controllers.AuthenticationController.login
+
+OPTIONS	/streams					controllers.LiveStreamsController.liveStreams
+POST	/streams					controllers.LiveStreamsController.liveStreams
+
+OPTIONS		/messages					controllers.MessagesController.getAllMessages
+POST		/messages					controllers.MessagesController.getAllMessages
+
+
+# Map static resources from the /public folder to the /assets URL path
+#GET     /assets/*file              controllers.Assets.at(path="/public", file)
+GET		/							controllers.Assets.at(path="/public", file="index.html")
+GET		/*file						controllers.Assets.at(path="/public", file)
+GET		/static/*file						controllers.Assets.at(path="/public/static", file)
+GET		/static/js/*file						controllers.Assets.at(path="/public/static/js", file)
+GET		/static/css/*file						controllers.Assets.at(path="/public/static/css", file)
+
+#->          /webjars                webjars.Routes
