@@ -114,7 +114,7 @@ https://dharani-sl-assignment.herokuapp.com/
 
 
 ### Logistics
-* I spent approximately 7 to 8 hours in total coding with debugging, fixing any issues
+* I spent approximately 6 to 7 hours in total coding with debugging, fixing any issues
 * For the server I spent about 3 to 4 hours and for client about 3 hours.
 * React made by job easier with composable views and routing. 
 * Moment I planned a layout, I was able to transform into simple views with HTML with React.
