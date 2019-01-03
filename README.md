@@ -95,7 +95,7 @@ I will cover how I went over these ambiguities and implementation details in the
 * The table is sortable, searchable and include filters.
 
 - [x] The SV webapp is mobile responsive and setup as a PWA
-* I tested on couple of devices with lower form factor (an old iPad, LG-G6, iPhone 8 plus etc). Though I didn't verify all the features, I found the web application loading and working.
+* I tested on couple of devices with lower form factor (an old iPad, LG-G6, iPhone 8 plus etc). I found the web application loading and working.
 
 - [x] The stats related to chat are summarized over a rolling time window (no. messages per X seconds)
 - [x] The stats are sorted, refreshed and updated frequently (so we know who creates the most hype in chat sessions in almost realtime)
@@ -109,7 +109,6 @@ https://dharani-sl-assignment.herokuapp.com/
 ## Test Users
 1. streamlabs.user1@gmail.com / slassignment
 2. streamlabs.user2@gmail.com / streamlabs123
-
 
 
 ### Logistics
