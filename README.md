@@ -75,16 +75,19 @@ I will cover how I went over these ambiguities and implementation details in the
 * Refer to [Stream](https://github.com/dharanikumarp/slassignment/tree/master/streamviewer-client/src/Stream) and [Chat broadcast](https://github.com/dharanikumarp/slassignment/tree/master/streamviewer-server/app/chat) on server.
 
 * Chat message sent from SV will also be posted in the YT*.
-[x] All messages by Kevin to Natalie's livestream chat should be stored in a persistent storage
+
+[x]All messages by Kevin to Natalie's livestream chat should be stored in a persistent storage
 * TODO
 
 [x] Alex should be able to visit the stats page
+
 [x] Alex should be able to see a table with usernames, message count (plus any other stats you feel like). This table should be sortable.
+
 * The stats page uses 'React Table' component.
 * This uses another web socket and the server will keep pushing the data to the client.
 * The table is sortable, searchable and has filter capabilities. 'React Table' does the magic.
 * This table shows the list of users, their total messages and their most active chat messages in a broadcast (i.e which stream they sent the maximum chat messages).
-* The server is database query with MongoDB aggregation. Refer [ChatMessageUtil] (https://github.com/dharanikumarp/slassignment/blob/master/streamviewer-server/app/utils/ChatMessageUtil.java) and [StatisticsActor] (https://github.com/dharanikumarp/slassignment/blob/master/streamviewer-server/app/actors/StatisticsActor.java)
+* The server is database query with MongoDB aggregation. Refer [ChatMessageUtil](https://github.com/dharanikumarp/slassignment/blob/master/streamviewer-server/app/utils/ChatMessageUtil.java) and [StatisticsActor](https://github.com/dharanikumarp/slassignment/blob/master/streamviewer-server/app/actors/StatisticsActor.java)
 
 [x] Alex should be able to search through all messages posted by Natalie's fans' usernames e.g. Kevin
 * Check out the [Messages](https://github.com/dharanikumarp/slassignment/tree/master/streamviewer-client/src/Messages) react component on the client side.
