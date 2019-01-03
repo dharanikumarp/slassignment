@@ -27,3 +27,5 @@ libraryDependencies += "org.assertj" % "assertj-core" % "3.8.0" % Test
 libraryDependencies += "org.awaitility" % "awaitility" % "3.0.0" % Test
 
 LessKeys.compress := true
+
+herokuAppName in Compile := "dharani-sl-assignment"
