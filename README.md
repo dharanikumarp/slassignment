@@ -107,6 +107,12 @@ I will cover how I went over these ambiguities and implementation details in the
 # Heroku App location
 https://dharani-sl-assignment.herokuapp.com/
 
+## Test Users
+1. streamlabs.user1@gmail.com / slassignment
+2. streamlabs.user2@gmail.com / streamlabs123
+
+
+
 ### Logistics
 * I spent approximately 7 to 8 hours in total coding with debugging, fixing any issues
 * For the server I spent about 3 to 4 hours and for client about 3 hours.
