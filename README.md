@@ -74,7 +74,7 @@ Here let me address the ambiguities. I prefer not to persist/display Bob's messa
 
 * However I have implmented the feature to pull all chat messages from YT and persist/display/compute statistics for them in SV during a broadcast. I provided a toggle to disable this feature at this moment. 
 
-* The toggle ['FILTER_SV_USERS_IN_YTLIVE_MESSAGES'] (https://github.com/dharanikumarp/slassignment/blob/master/streamviewer-server/app/utils/UrlsAndConstants.java), if true will filter only messages of SV from YT.
+* The toggle [FILTER_SV_USERS_IN_YTLIVE_MESSAGES](https://github.com/dharanikumarp/slassignment/blob/master/streamviewer-server/app/utils/UrlsAndConstants.java), if true will filter only messages of SV from YT.
 
 * This toggle is a compile time toggle, hence we need to change code and redeploy. If you are interested, I can redeploy the app with the toggle enabled and you can see the flood of messages from YT to SV.
 
@@ -90,9 +90,9 @@ Here let me address the ambiguities. I prefer not to persist/display Bob's messa
 
 * Chat message sent from SV will also be posted in the YT*.
 
-- [x]All messages by Kevin to Natalie's livestream chat should be stored in a persistent storage
+- [x] All messages by Kevin to Natalie's livestream chat should be stored in a persistent storage
 
-1. Here I assume Kevin is SV app user. So any messages by Kevin from SV app or from YT* (while someone watches Natalie stream) will be persisted.
+1. Here I assume Kevin is SV app user. So any messages by Kevin from SV app or from YT*(while someone watches Natalie stream) will be persisted.
 
 2. If currently there are no users logged in SV app, then SV server will remain idle and does not pull data from YT live.
 
