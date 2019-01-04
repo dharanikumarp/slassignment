@@ -27,7 +27,6 @@ class AllUserAndStreamStats extends Component {
     }
 
     componentWillUnmount() {
-        console.log('AllUserAndStreamStats.componentWillUnmount()');
         this.ws.close();
     }
     

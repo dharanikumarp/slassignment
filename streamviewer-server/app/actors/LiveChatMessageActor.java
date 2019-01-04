@@ -51,6 +51,7 @@ public class LiveChatMessageActor extends AbstractActor {
 	public void postStop() throws Exception {
 		ChatBroadCastManager.getInstance().removeActor(this.out);
 		ChatStatsManager.getInstance().removeChannel(this.out);
+		YTLiveChatManager.getInstance().removeActor(this.out);
 		super.postStop();
 	}
 
@@ -108,8 +109,6 @@ public class LiveChatMessageActor extends AbstractActor {
 	}
 
 	private void pushChatMessageToYTLive(final ChatMessage cm, final String accessToken) {
-		System.out.println("LiveChatMessageActor.pushChatMessageToYTLive()");
-		
 		Map<String, Object> textMessageDetails = new HashMap<>();
 		textMessageDetails.put("messageText", cm.getMessage());
 
@@ -121,13 +120,9 @@ public class LiveChatMessageActor extends AbstractActor {
 		Map<String, Object> postBody = new HashMap<>();
 		postBody.put("snippet", snippet);
 		
-		System.out.println("postBody " + Json.toJson(postBody));
-
 		CompletionStage<JsonNode> futureResponse = ws.url(LIVE_CHATMESSAGES_URL).addQueryParameter("part", "snippet")
-				//.addQueryParameter("key", API_KEY)
 				.addHeader("Authorization", "Bearer " + accessToken)
 				.post(Json.toJson(postBody)).thenApply(r -> r.asJson());
-
 		try {
 			JsonNode json = futureResponse.toCompletableFuture().get();
 			System.out.println("response json " + json);

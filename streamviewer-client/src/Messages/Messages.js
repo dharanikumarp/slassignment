@@ -56,7 +56,7 @@ class Messages extends Component {
             {
                 Header: 'Message',
                 accessor: 'message',
-                sortable: false,
+                sortable: true,
                 filterable: true
             },
             {

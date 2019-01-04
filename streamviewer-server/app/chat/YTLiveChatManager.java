@@ -1,8 +1,6 @@
 package chat;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,7 +37,7 @@ public class YTLiveChatManager {
 			chatIdVsActors.put(cm.getLiveChatId(), set);
 			Timer t = new Timer();
 			t.schedule(new YTLiveChatMessageFetchTask(t, ws, cm.getLiveChatId(), cm.getVideoId(), cm.getTitle(),
-					cm.getDescription()), DELAY);
+					cm.getDescription(), null, 0), DELAY);
 
 			chatIdVsTimer.put(cm.getLiveChatId(), t);
 		}
@@ -72,23 +70,5 @@ public class YTLiveChatManager {
 			chatIdVsTimer.remove(s);
 			chatIdVsActors.remove(s);
 		});
-	}
-
-	private void cleanUpOld() {
-		Set<String> keySet = chatIdVsActors.keySet();
-
-		List<String> chatIdsToRemove = new ArrayList<String>();
-		for (String liveChatId : keySet) {
-			Set<ActorRef> set = chatIdVsActors.get(liveChatId);
-
-			if (set == null || set.isEmpty()) {
-				chatIdVsTimer.get(liveChatId).cancel();
-				chatIdsToRemove.add(liveChatId);
-			}
-		}
-
-		for (String str : chatIdsToRemove) {
-			chatIdVsActors.remove(str);
-		}
 	}
 }

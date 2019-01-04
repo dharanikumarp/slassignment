@@ -26,6 +26,11 @@ function AllUserStats(props) {
             sortable: true,
         },
         {
+            Header: 'Most Active Stream Title',
+            accessor: 'title',
+            sortable: true
+        },
+        {
             Header: 'Most Active Stream - Num Messages',
             accessor: 'mostActiveVideoNumMsgs',
             sortable: true

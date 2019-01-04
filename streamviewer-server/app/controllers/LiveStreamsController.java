@@ -94,7 +94,8 @@ public class LiveStreamsController extends Controller {
 			
 		} else {
 			// User itself is broadcasting currently. We will also send other public live streams along
-			response.put("liveStreams", myLiveStreams.addAll(publicLiveStreams));
+			myLiveStreams.addAll(publicLiveStreams);
+			response.put("liveStreams", myLiveStreams);
 			response.put("self", true);
 		}
 

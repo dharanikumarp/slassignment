@@ -38,4 +38,10 @@ public class Subscription {
 	public void setChannelId(String channelId) {
 		this.channelId = channelId;
 	}
+
+	@Override
+	public String toString() {
+		return "Subscription [id=" + id + ", title=" + title + ", description=" + description + ", channelId="
+				+ channelId + "]";
+	}
 }

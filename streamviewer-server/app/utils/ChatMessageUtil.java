@@ -5,6 +5,7 @@ import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.gte;
 import static com.mongodb.client.model.Filters.lte;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -125,13 +126,15 @@ public final class ChatMessageUtil {
 
 		AggregateIterable<Document> iterable = chatCollection.aggregate(Arrays.asList(new Document("$group",
 				new Document("_id", new Document("gmail", "$gmail").append("videoId", "$videoId"))
-						.append("count", new Document("$sum", 1)).append("sender", new Document("$first", "$sender")))
+						.append("count", new Document("$sum", 1)).append("sender", new Document("$first", "$sender"))
+						.append("title", new Document("$first", "$title")))
 
 				, new Document("$sort", new Document("count", -1)),
 				new Document("$group",
 						new Document("_id", "$_id.gmail")
 								.append("mostActiveVideo", new Document("$first", "$_id.videoId"))
 								.append("sender", new Document("$first", "$sender"))
+								.append("title", new Document("$first", "$title"))
 								.append("mostActiveVideoNumMsgs", new Document("$first", "$count")))));
 
 		final List<Document> countUserVideos = new ArrayList<Document>();
@@ -181,23 +184,14 @@ public final class ChatMessageUtil {
 			Date to) {
 		MongoCollection<Document> chatCollection = MongoManager.getDatabase()
 				.getCollection(MongoManager.COLLECTION_CHATS);
-		
-		List<Document> list = new ArrayList<>();
 
+		List<Document> list = new ArrayList<>();
 		Consumer<Document> consumer = (doc) -> {
 			list.add(doc);
 		};
-		List<Document> history = new ArrayList<>();
-		chatCollection.find(and(eq("videoId", videoId), eq("gmail", gmail), gte("time", from), lte("time", to))).sort(new Document("time", -1)).forEach(consumer);
 
-		return history;
+		chatCollection.find(and(eq("videoId", videoId), eq("gmail", gmail), gte("time", from), lte("time", to)))
+				.sort(new Document("time", -1)).forEach(consumer);
+		return list;
 	}
-
-	public static void main(String args[]) {
-		List<Document> docs = getCountChatMessagesForVideoByUser("v1");
-		docs.forEach((doc) -> {
-			System.out.println(doc);
-		});
-	}
-
 }

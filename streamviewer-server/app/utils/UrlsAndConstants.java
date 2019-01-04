@@ -14,7 +14,7 @@ public final class UrlsAndConstants {
 	public static final int MAX_RESULTS = 12;
 	public static final String SEARCH_TERM = "fortnite";
 	
-	public static final boolean SHOW_PUBLIC_BROADCASTS = false;
-	public static final boolean FETCH_YTLIVE_MESSAGES = false;
+	public static final boolean SHOW_PUBLIC_BROADCASTS = true;
+	public static final boolean FETCH_YTLIVE_MESSAGES = true;
 	public static final boolean FILTER_SV_USERS_IN_YTLIVE_MESSAGES = true;
 }

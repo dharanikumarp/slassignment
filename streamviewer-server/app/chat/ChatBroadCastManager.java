@@ -1,5 +1,6 @@
 package chat;
 
+import java.nio.channels.InterruptedByTimeoutException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -66,6 +67,16 @@ public class ChatBroadCastManager {
 			for (ActorRef actor : set) {
 				actor.tell(Json.toJson(cm), null);
 			}
+		}
+	}
+	
+	//New method to prevent AKKA buffer overflow when pulling messages from youtube live.
+	public void broadCastMessage(final ChatMessage cm, long delay) {
+		try {
+			Thread.sleep(delay);
+			this.broadCastMessage(cm);
+		} catch(InterruptedException ie) {
+			
 		}
 	}
 }
