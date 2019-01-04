@@ -59,67 +59,66 @@ I will cover how I went over these ambiguities and implementation details in the
   * Check out [SHOW_PUBLIC_BROADCASTS](https://github.com/dharanikumarp/slassignment/blob/master/streamviewer-server/app/utils/UrlsAndConstants.java) and [LiveSteamUtil](https://github.com/dharanikumarp/slassignment/blob/master/streamviewer-server/app/utils/LiveStreamsUtil.java)
 
 - [x] Alex should be able to click on a livestream to watch it. 
-* Check out [Streams](https://github.com/dharanikumarp/slassignment/tree/master/streamviewer-client/src/Streams) and [Stream](https://github.com/dharanikumarp/slassignment/tree/master/streamviewer-client/src/Stream) react components. The Stream component further compose video player, chat and statistics.
+  * Check out [Streams](https://github.com/dharanikumarp/slassignment/tree/master/streamviewer-client/src/Streams) and [Stream](https://github.com/dharanikumarp/slassignment/tree/master/streamviewer-client/src/Stream) react components. The Stream component further compose video player, chat and statistics.
 
 - [x] Alex should be able to see the associated chat session while watching Natalie's stream
 
 Here let me address the ambiguities. I prefer not to persist/display Bob's messages in SV application because
 
-1. Foremost reason why I am not displaying Bob's chat messages is that we lose realtime. YT LiveChatMessages API can only be polled at an interval provided by an earlier response. Typical value 'pollingTimeInMillis' is between 1200ms to 10000ms. That means we lose liveness factor right away if we poll messages from YT LiveChatMessages API.
-2. The statistics computation will be inaccurate, as we lose the liveness factor because of YT API polling.
-3. Bob has not given authorisation to SV app to process his personal information. 
-4. Storing and broadcasting non-SV user messages in the SV app will exhaust the resources. Given this assignment requirement and a small dyno in Heroku, this infrastructure will not support high load of messages thrown at it in a very short span of time.
-5. I assume that the assignment objective is to analyse/evaluate my coding skills and not about scalability.
-6. Messages entered by Alex or any other registered user of SV from Yt* will be stored/displayed in SV.
+  1. Foremost reason why I am not displaying Bob's chat messages is that we lose realtime. YT LiveChatMessages API can only be polled at an interval provided by an earlier response. Typical value 'pollingTimeInMillis' is between 1200ms to 10000ms. That means we lose liveness factor right away if we poll messages from YT LiveChatMessages API.
+  1. The statistics computation will be inaccurate, as we lose the liveness factor because of YT API polling.
+  1. Bob has not given authorisation to SV app to process his personal information. 
+  1. Storing and broadcasting non-SV user messages in the SV app will exhaust the resources. Given this assignment requirement and a small dyno in Heroku, this infrastructure will not support high load of messages thrown at it in a very short span of time.
+  1. I assume that the assignment objective is to analyse/evaluate my coding skills and not about scalability.
+  1. Messages entered by Alex or any other registered user of SV from Yt* will be stored/displayed in SV.
 
-* However I have implmented the feature to pull all chat messages from YT and persist/display/compute statistics for them in SV during a broadcast. I provided a toggle to disable this feature at this moment. 
+  1. However I have implmented the feature to pull all chat messages from YT and persist/display/compute statistics for them in SV during a broadcast. I provided a toggle to disable this feature at this moment. 
 
-* The toggle [FILTER_SV_USERS_IN_YTLIVE_MESSAGES](https://github.com/dharanikumarp/slassignment/blob/master/streamviewer-server/app/utils/UrlsAndConstants.java), if true will filter only messages of SV from YT.
+  1. The toggle [FILTER_SV_USERS_IN_YTLIVE_MESSAGES](https://github.com/dharanikumarp/slassignment/blob/master/streamviewer-server/app/utils/UrlsAndConstants.java), if true will filter only messages of SV from YT.
 
-* This toggle is a compile time toggle, hence we need to change code and redeploy. If you are interested, I can redeploy the app with the toggle enabled and you can see the flood of messages from YT to SV.
+  1. This toggle is a compile time toggle, hence we need to change code and redeploy. If you are interested, I can redeploy the app with the toggle enabled and you can see the flood of messages from YT to SV.
 
-* Refer [YTLiveChatMessageFetchTask](https://github.com/dharanikumarp/slassignment/blob/master/streamviewer-server/app/chat/YTLiveChatMessageFetchTask.java) for more information.
+  1. Refer [YTLiveChatMessageFetchTask](https://github.com/dharanikumarp/slassignment/blob/master/streamviewer-server/app/chat/YTLiveChatMessageFetchTask.java) for more information.
 
-* The [Stream] component/page shows the video player, chat window, rolling time summary of chat messages and user momentum in the current stream (who is sending more messages)
-* [React Table](https://react-table.js.org/#/story/readme) is used to display rolling summary and user chat statistics.
+  1. The [Stream] component/page shows the video player, chat window, rolling time summary of chat messages and user momentum in the current stream (who is sending more messages)
+  1. [React Table](https://react-table.js.org/#/story/readme) is used to display rolling summary and user chat statistics.
 
 - [x] Alex should be able to post messages to the chat session for the livestream he's viewing
-* Chat messages are sent through websocket and in the server broadcasted to the clients watching the same live broadcast.
-* Server implementation uses a modification of Actors to support chat room and broadcasting. I can say, this is my novel implementation of turning the existing Actor based flow into chat room. Akka supports broadcasting with [Graph DSL flow model](https://doc.akka.io/docs/akka/2.5/stream/stream-graphs.html), however I felt it was complex to implement in a short time.
-* Refer to [Stream](https://github.com/dharanikumarp/slassignment/tree/master/streamviewer-client/src/Stream) and [Chat broadcast](https://github.com/dharanikumarp/slassignment/tree/master/streamviewer-server/app/chat) on server.
+  * Chat messages are sent through websocket and in the server broadcasted to the clients watching the same live broadcast.
+  * Server implementation uses a modification of Actors to support chat room and broadcasting. I can say, this is my novel implementation of turning the existing Actor based flow into chat room. Akka supports broadcasting with [Graph DSL flow model](https://doc.akka.io/docs/akka/2.5/stream/stream-graphs.html), however I felt it was complex to implement in a short time.
+  * Refer to [Stream](https://github.com/dharanikumarp/slassignment/tree/master/streamviewer-client/src/Stream) and [Chat broadcast](https://github.com/dharanikumarp/slassignment/tree/master/streamviewer-server/app/chat) on server.
 
-* Chat message sent from SV will also be posted in the YT*.
+  * Chat message sent from SV will also be posted in the YT*.
 
 - [x] All messages by Kevin to Natalie's livestream chat should be stored in a persistent storage
 
-1. Here I assume Kevin is SV app user. So any messages by Kevin from SV app or from YT*(while someone watches Natalie stream) will be persisted.
-
-2. If currently there are no users logged in SV app, then SV server will remain idle and does not pull data from YT live.
+  * Here I assume Kevin is SV app user. So any messages by Kevin from SV app or from YT*(while someone watches Natalie stream) will be persisted.
+  * If currently there are no users logged in SV app, then SV server will remain idle and does not pull data from YT live.
 
 - [x] Alex should be able to visit the stats page
 - [x] Alex should be able to see a table with usernames, message count (plus any other stats you feel like). This table should be sortable.
 
-* The stats page uses 'React Table' component.
-* This uses another web socket and the server will keep pushing the data to the client.
-* The table is sortable, searchable and has filter capabilities. 'React Table' does the magic.
-* This table shows the list of users, their total messages and their most active chat messages in a broadcast (i.e which stream they sent the maximum chat messages).
-* The server is database query with MongoDB aggregation. Refer [ChatMessageUtil](https://github.com/dharanikumarp/slassignment/blob/master/streamviewer-server/app/utils/ChatMessageUtil.java) and [StatisticsActor](https://github.com/dharanikumarp/slassignment/blob/master/streamviewer-server/app/actors/StatisticsActor.java)
+  * The stats page uses 'React Table' component.
+  * This uses another web socket and the server will keep pushing the data to the client.
+  * The table is sortable, searchable and has filter capabilities. 'React Table' does the magic.
+  * This table shows the list of users, their total messages and their most active chat messages in a broadcast (i.e which stream they sent the maximum chat messages).
+  * The server is database query with MongoDB aggregation. Refer [ChatMessageUtil](https://github.com/dharanikumarp/slassignment/blob/master/streamviewer-server/app/utils/ChatMessageUtil.java) and [StatisticsActor](https://github.com/dharanikumarp/slassignment/blob/master/streamviewer-server/app/actors/StatisticsActor.java)
 
 - [x] Alex should be able to search through all messages posted by Natalie's fans' usernames e.g. Kevin
-* Check out the [Messages](https://github.com/dharanikumarp/slassignment/tree/master/streamviewer-client/src/Messages) react component on the client side.
-* React table does the magic and the server provides the data.
-* The table is sortable, searchable and include filters.
+  * Check out the [Messages](https://github.com/dharanikumarp/slassignment/tree/master/streamviewer-client/src/Messages) react component on the client side.
+  * React table does the magic and the server provides the data.
+  * The table is sortable, searchable and include filters.
 
 - [ ] The SV webapp is mobile responsive and setup as a PWA
-* I tested on couple of devices with lower form factor (an old iPad, LG-G6, iPhone 8 plus etc). I found the features working.
-* Not sure whether the app work when user is offline or behind a poor connectivity.
-* Hence I have not marked this item as completed.
+  * I tested on couple of devices with lower form factor (an old iPad, LG-G6, iPhone 8 plus etc). I found the features working.
+  * Not sure whether the app work when user is offline or behind a poor connectivity.
+  * Hence I have not marked this item as completed.
 
 - [x] The stats related to chat are summarized over a rolling time window (no. messages per X seconds)
 - [x] The stats are sorted, refreshed and updated frequently (so we know who creates the most hype in chat sessions in almost realtime)
-* The stream page will show the chat frequency in a rolling time window for fixed intervals (1, 5, 10, 30 & 60 seconds). You can type few messages in a short span and see the table getting updated as the intervals passby. I followed the idea from the CPU graph in Ubuntu & Windows.
+  * The stream page will show the chat frequency in a rolling time window for fixed intervals (1, 5, 10, 30 & 60 seconds). You can type few messages in a short span and see the table getting updated as the intervals passby. I followed the idea from the CPU graph in Ubuntu & Windows.
 
-* The chat stats are always sorted in descending order in user with most chat messages. All the tables showing statistics and any other information are always sortable.
+  * The chat stats are always sorted in descending order in user with most chat messages. All the tables showing statistics and any other information are always sortable.
 
 # Heroku App location
 https://dharani-sl-assignment.herokuapp.com/
@@ -138,6 +137,3 @@ https://dharani-sl-assignment.herokuapp.com/
 * React made by job easier with composable views and routing. 
 * Moment I planned a layout, I was able to transform into simple views with HTML with React.
 * Except for the chat window (which doesn't look very pretty, but still good looking !!!), I used standard html and components from react framework.
-
-* I spent about 20 minutes writing this readme.
-* May be another 10 minutes for the an video (upcoming)
