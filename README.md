@@ -55,8 +55,9 @@ I will cover how I went over these ambiguities and implementation details in the
 - [x] Alex should be presented with multiple livestreams to choose from on the home page. These are sourced from YT live api and selected/sorted based on logic you define
   * In my first design I restricted the live broadcasts to a closed subscription model, whereby only registered users of SV broadcasts will be listed. So Bob's live broadcast won't be shown in the list. This also means that Natalie should be a registered user of SV and both Alex, Kevin should have subscribed to Natalie's channel.
   * What if Natalie (our active streamer) is sick? Then users visiting SV will be disappointed and will turn away. So in order to increase the DAU (daily average users), I added a feature flag to list public streams as well.
-  * For now the public broadcasts are searched with term "fortnite" (my kids favourite) and limited to 12 live streams.
+  * For now the public broadcasts are searched with term "fortnite" and limited to 12 live streams.
   * Check out [SHOW_PUBLIC_BROADCASTS](https://github.com/dharanikumarp/slassignment/blob/master/streamviewer-server/app/utils/UrlsAndConstants.java) and [LiveSteamUtil](https://github.com/dharanikumarp/slassignment/blob/master/streamviewer-server/app/utils/LiveStreamsUtil.java)
+  * The first set of videos in the broadcast list would always be from the registered users of SV app, followed by public streams.
 
 - [x] Alex should be able to click on a livestream to watch it. 
   * Check out [Streams](https://github.com/dharanikumarp/slassignment/tree/master/streamviewer-client/src/Streams) and [Stream](https://github.com/dharanikumarp/slassignment/tree/master/streamviewer-client/src/Stream) react components. The Stream component further compose video player, chat and statistics.
@@ -70,13 +71,11 @@ Here let me address the ambiguities. I prefer not to persist/display Bob's messa
   1. Bob has not given authorisation to SV app to process his personal information. 
   1. Storing and broadcasting non-SV user messages in the SV app will exhaust the resources. Given this assignment requirement and a small dyno in Heroku, this infrastructure will not support high load of messages thrown at it in a very short span of time.
   1. I assume that the assignment objective is to analyse/evaluate my coding skills and not about scalability.
-  1. Messages entered by Alex or any other registered user of SV from Yt* will be stored/displayed in SV.
-
+  1. Messages entered by Alex or any other registered user of SV from YT* will be stored/displayed in SV.
+  
   1. However I have implmented the feature to pull all chat messages from YT and persist/display/compute statistics for them in SV during a broadcast. I provided a toggle to disable this feature at this moment. 
-
-  1. The toggle [FILTER_SV_USERS_IN_YTLIVE_MESSAGES](https://github.com/dharanikumarp/slassignment/blob/master/streamviewer-server/app/utils/UrlsAndConstants.java), if true will filter only messages of SV from YT.
-
-  1. This toggle is a compile time toggle, hence we need to change code and redeploy. If you are interested, I can redeploy the app with the toggle enabled and you can see the flood of messages from YT to SV.
+  1. The toggle [FILTER_SV_USERS_IN_YTLIVE_MESSAGES](https://github.com/dharanikumarp/slassignment/blob/master/streamviewer-server/app/utils/UrlsAndConstants.java), if true will filter only messages of SV from YT. Current it is true, if you make it false, then messages from all chat users will be displayed in SV.
+  1. This toggle is a compile time toggle, hence we need to change code and redeploy. If you are interested, I can redeploy the app with the toggle enabled and you can see the flood of messages from YT to SV. I have also handled the AKKA buffer overflow error with an additional delay before broadcasting messages to SV app users.
 
   1. Refer [YTLiveChatMessageFetchTask](https://github.com/dharanikumarp/slassignment/blob/master/streamviewer-server/app/chat/YTLiveChatMessageFetchTask.java) for more information.
 
@@ -93,7 +92,7 @@ Here let me address the ambiguities. I prefer not to persist/display Bob's messa
 - [x] All messages by Kevin to Natalie's livestream chat should be stored in a persistent storage
 
   * Here I assume Kevin is SV app user. So any messages by Kevin from SV app or from YT*(while someone watches Natalie stream) will be persisted.
-  * If currently there are no users logged in SV app, then SV server will remain idle and does not pull data from YT live.
+  * If there are no users logged in SV app, then SV server will remain idle and does not pull data from YT live.
 
 - [x] Alex should be able to visit the stats page
 - [x] Alex should be able to see a table with usernames, message count (plus any other stats you feel like). This table should be sortable.
@@ -132,7 +131,7 @@ https://dharani-sl-assignment.herokuapp.com/
 
 
 ### Logistics
-* I spent approximately 6 to 7 hours in total coding with debugging, fixing any issues
+* I spent approximately 7 to 8 hours in total coding with debugging, fixing any issues, writing this readme, and capturing a video demo.
 * For the server I spent about 3 to 4 hours and for client about 3 hours.
 * React made by job easier with composable views and routing. 
 * Moment I planned a layout, I was able to transform into simple views with HTML with React.
