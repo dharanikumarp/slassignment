@@ -17,9 +17,7 @@ MongoDB - One among the popular high performing document database.
 * I have not used Spring-Boot before.
 * Play is highly scalable, reactive, event driven, uses Akka and Actor based model. It comes bundled with all tools required for server development for this project including WebSockets, RESTful API support.
  * For the **Coacheeva (side project)**, I use play framework, mongoDB and Ionic (mobile). The application is live in heroku and mongolabs.
-* Apache Jersey is a JAX-RS implementation. We need to bring in a server with web socket capabilities such as Tomcat/Jetty.
 * I am currently using React to develop the next generation platform for [CoachingOurselves](https://www.coachingourselves.com) and Coacheeva.
-* I want to further improve react framework and my Javascript skills.
 
 ###### The current CoachingOurselves platform is based on WordPress.
 
@@ -32,14 +30,14 @@ There are two directories, one for the server and other for the client.
 * Then build the server using "sbt compile" followed by "sbt stage deployHeroku" if using heroku toolbelt or use heroku API key.
 * The mongodb is hosted in mongolabs. Heroku does the provisioning.
 
-I will re-list the requirements from the assignment and provide assumptions & implementation specifics wherever I feel it would help ease the understanding.
+I will re-list the requirements from the assignment in the task list format and mention the assumptions & implementation specifics wherever I feel it would help ease the understanding.
 
 ## Requirements and Solution Details
 
 In summary this exercise requires integration of two systems YouTube(YT) which includes www.youtube.com (YT Web), https://studio.youtube.com (YT studio) & youtube mobile app (YT Mobile) with StreamViewer (SV). This is how I perceive the requirement, but I could be wrong.
 
-I will add one more persona here to make things clear
-Bob (our famous cryptography persona). Bob is not associated with SV so far (i.e he has never visited sv before), but still a fan of Natalie, wathces Natalie streams from YT Web or YT Mobile and will chat with Natalie along many other fans.
+I will add one more persona here to make things clear,
+Bob (our famous cryptography persona). Bob is not associated with SV so far (i.e he has never visited sv before), but a fan of Natalie, wathces Natalie streams from YT Web or YT Mobile and will chat along many other fans.
 
 ### Ambiguities
 1. Should we process and display Bob's chat messages within SV? Bob will mostly chat from YT* 
@@ -55,17 +53,33 @@ I will cover how I went over these ambiguities and implementation details in the
   * Created a accesToken verifier on the server to authorize the API calls from client. Refer [AccessTokenVerifier](https://github.com/dharanikumarp/slassignment/blob/master/streamviewer-server/app/action/AccessTokenVerifierAction.java)
 
 - [x] Alex should be presented with multiple livestreams to choose from on the home page. These are sourced from YT live api and selected/sorted based on logic you define
-  * Initially I restricted the live broadcasts to a closed subscription model, whereby only registered users of SV broadcasts will be listed. So Bob's live broadcast won't be shown in the list. This also means that Natalie should be a registered user of SV and both Alex, Kevin should have subscribed to Natalie's channel.
+  * In my first design I restricted the live broadcasts to a closed subscription model, whereby only registered users of SV broadcasts will be listed. So Bob's live broadcast won't be shown in the list. This also means that Natalie should be a registered user of SV and both Alex, Kevin should have subscribed to Natalie's channel.
   * What if Natalie (our active streamer) is sick? Then users visiting SV will be disappointed and will turn away. So in order to increase the DAU (daily average users), I added a feature flag to list public streams as well.
   * For now the public broadcasts are searched with term "fortnite" (my kids favourite) and limited to 12 live streams.
   * Check out [SHOW_PUBLIC_BROADCASTS](https://github.com/dharanikumarp/slassignment/blob/master/streamviewer-server/app/utils/UrlsAndConstants.java) and [LiveSteamUtil](https://github.com/dharanikumarp/slassignment/blob/master/streamviewer-server/app/utils/LiveStreamsUtil.java)
-
 
 - [x] Alex should be able to click on a livestream to watch it. 
 * Check out [Streams](https://github.com/dharanikumarp/slassignment/tree/master/streamviewer-client/src/Streams) and [Stream](https://github.com/dharanikumarp/slassignment/tree/master/streamviewer-client/src/Stream) react components. The Stream component further compose video player, chat and statistics.
 
 - [x] Alex should be able to see the associated chat session while watching Natalie's stream
-* TODO
+
+Here let me address the ambiguities. I prefer not to persist/display Bob's messages in SV application because
+
+1. Foremost reason why I am not displaying Bob's chat messages is that we lose realtime. YT LiveChatMessages API can only be polled at an interval provided by an earlier response. Typical value 'pollingTimeInMillis' is between 1200ms to 10000ms. That means we lose liveness factor right away if we poll messages from YT LiveChatMessages API.
+2. The statistics computation will be inaccurate, as we lose the liveness factor because of YT API polling.
+3. Bob has not given authorisation to SV app to process his personal information. 
+4. Storing and broadcasting non-SV user messages in the SV app will exhaust the resources. Given this assignment requirement and a small dyno in Heroku, this infrastructure will not support high load of messages thrown at it in a very short span of time.
+5. I assume that the assignment objective is to analyse/evaluate my coding skills and not about scalability.
+6. Messages entered by Alex or any other registered user of SV from Yt* will be stored/displayed in SV.
+
+* However I have implmented the feature to pull all chat messages from YT and persist/display/compute statistics for them in SV during a broadcast. I provided a toggle to disable this feature at this moment. 
+
+* The toggle ['FILTER_SV_USERS_IN_YTLIVE_MESSAGES'] (https://github.com/dharanikumarp/slassignment/blob/master/streamviewer-server/app/utils/UrlsAndConstants.java), if true will filter only messages of SV from YT.
+
+* This toggle is a compile time toggle, hence we need to change code and redeploy. If you are interested, I can redeploy the app with the toggle enabled and you can see the flood of messages from YT to SV.
+
+* Refer [YTLiveChatMessageFetchTask](https://github.com/dharanikumarp/slassignment/blob/master/streamviewer-server/app/chat/YTLiveChatMessageFetchTask.java) for more information.
+
 * The [Stream] component/page shows the video player, chat window, rolling time summary of chat messages and user momentum in the current stream (who is sending more messages)
 * [React Table](https://react-table.js.org/#/story/readme) is used to display rolling summary and user chat statistics.
 
@@ -77,10 +91,12 @@ I will cover how I went over these ambiguities and implementation details in the
 * Chat message sent from SV will also be posted in the YT*.
 
 - [x]All messages by Kevin to Natalie's livestream chat should be stored in a persistent storage
-* TODO
+
+1. Here I assume Kevin is SV app user. So any messages by Kevin from SV app or from YT* (while someone watches Natalie stream) will be persisted.
+
+2. If currently there are no users logged in SV app, then SV server will remain idle and does not pull data from YT live.
 
 - [x] Alex should be able to visit the stats page
-
 - [x] Alex should be able to see a table with usernames, message count (plus any other stats you feel like). This table should be sortable.
 
 * The stats page uses 'React Table' component.
@@ -94,8 +110,10 @@ I will cover how I went over these ambiguities and implementation details in the
 * React table does the magic and the server provides the data.
 * The table is sortable, searchable and include filters.
 
-- [x] The SV webapp is mobile responsive and setup as a PWA
-* I tested on couple of devices with lower form factor (an old iPad, LG-G6, iPhone 8 plus etc). I found the web application loading and working.
+- [ ] The SV webapp is mobile responsive and setup as a PWA
+* I tested on couple of devices with lower form factor (an old iPad, LG-G6, iPhone 8 plus etc). I found the features working.
+* Not sure whether the app work when user is offline or behind a poor connectivity.
+* Hence I have not marked this item as completed.
 
 - [x] The stats related to chat are summarized over a rolling time window (no. messages per X seconds)
 - [x] The stats are sorted, refreshed and updated frequently (so we know who creates the most hype in chat sessions in almost realtime)
@@ -109,6 +127,9 @@ https://dharani-sl-assignment.herokuapp.com/
 ## Test Users
 1. streamlabs.user1@gmail.com / slassignment
 2. streamlabs.user2@gmail.com / streamlabs123
+
+## Limitations/Known Issues
+1. It takes a while before YT API lists the live broadcast from the users. I remember waiting more than couple of minutes after starting a broadcast from another account.
 
 
 ### Logistics
